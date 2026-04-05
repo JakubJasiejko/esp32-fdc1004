@@ -1,21 +1,21 @@
 # esp32-fdc1004
 
-Biblioteka do obsługi `FDC1004` na ESP32 z gotowymi funkcjami do konfiguracji pomiaru, triggerowania i przeliczania wyniku pojemności.
+`FDC1004` driver for ESP32 with ready-to-use helpers for measurement configuration, triggering, and capacitance conversion.
 
-## Co zawiera
-- konfigurację pomiaru single-ended i differential
-- automatyczny trigger i odczyt wyników
-- pomocniczą logikę `CAPDAC`
+## Features
+- single-ended and differential measurement setup
+- measurement triggering and result readout
+- helper logic for `CAPDAC`
 
-## Zależności
+## Dependencies
 - `esp32-i2c-tools`
-- `esp32-uart-xor` dla debugowania
+- optional `esp32-uart-xor` for debug output
 
-## Pliki
+## Files
 - `include/fdc1004.h`
 - `src/fdc1004.c`
 
-## Szybki start
+## Quick start
 ```c
 #include "fdc1004.h"
 
@@ -29,4 +29,4 @@ void app_main(void)
 }
 ```
 
-Pełny przykład znajdziesz w `examples/basic_usage/basic_usage.c`.
+See `examples/basic_usage/basic_usage.c` for a complete example.
