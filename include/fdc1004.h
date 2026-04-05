@@ -1,12 +1,12 @@
-/*
-* @file fdc1004.h
-* @author inż. Jakub Jasiejko
-* @date 2025-03-30
-* @brief Interfejs dla czujnika pojemnościowego FDC1004.
-*
-* Definiuje funkcje i stałe do konfiguracji i odczytu danych z czujnika FDC1004
-* przez magistralę I2C z obsługą multipleksera PCA9548.
-*/
+/**
+ * @file fdc1004.h
+ * @author Jakub Jasiejko
+ * @date 2025-03-30
+ * @brief Public interface for the FDC1004 capacitive sensor driver.
+ *
+ * Provides configuration and data acquisition helpers for the FDC1004 over I2C,
+ * including optional PCA9548 channel selection.
+ */
 
  
 
@@ -27,71 +27,78 @@
  #endif
  
  /**
-  * @brief Oblicza wartość CAPDAC w oparciu o offset (w pF).
+  * @brief Converts a capacitance offset in pF to the CAPDAC register value.
   *
-  * @param offset Offset w pikofaradach (max ~97.625 pF)
-  * @return CAPDAC (0–31) jako liczba całkowita
+  * @param offset Offset in picofarads (maximum about 97.625 pF)
+  * @return CAPDAC code in the range 0..31
   */
  uint8_t calculateCapdac(float offset);
  
  /**
-  * @brief Konfiguruje pojedyńczy pomiar na FDC1004.
+  * @brief Configures a single-ended FDC1004 measurement.
   *
-  * @param PCAaddr Adres multipleksera PCA9548
-  * @param pcaChannel Maska kanału PCA9548 do aktywacji
-  * @param meas Numer kanału MEAS (0–3)
-  * @param cin Wejście pomiarowe CIN (0–3)
-  * @param offset Offset pojemności (pF) dla CAPDAC
+  * @param PCAaddr Address of the PCA9548 multiplexer
+  * @param pcaChannel PCA9548 channel mask to enable
+  * @param meas Measurement slot number (0..3)
+  * @param cin Input channel CIN (0..3)
+  * @param offset Capacitance offset in pF used for CAPDAC compensation
   */
  void FDC1004_configureMeasurement(uint8_t PCAaddr, uint8_t pcaChannel, uint8_t meas, uint8_t cin, float offset);
  
  /**
-  * @brief Konfiguruje pomiar różnicowy (dwa wejścia CIN).
+  * @brief Configures a differential measurement using two CIN inputs.
   *
-  * @param PCAaddr Adres multipleksera PCA9548
-  * @param pcaChannel Maska kanału PCA9548 do aktywacji
-  * @param meas Numer kanału MEAS (0–3)
-  * @param cin1 Wejście dodatnie
-  * @param cin2 Wejście ujemne
+  * @param PCAaddr Address of the PCA9548 multiplexer
+  * @param pcaChannel PCA9548 channel mask to enable
+  * @param meas Measurement slot number (0..3)
+  * @param cin1 Positive input channel
+  * @param cin2 Negative input channel
   */
  void FDC1004_configureDifferencialMeasurement(uint8_t PCAaddr, uint8_t pcaChannel, uint8_t meas, uint8_t cin1, uint8_t cin2);
  
  /**
-  * @brief Wyzwala pojedynczy pomiar dla wskazanego kanału.
+  * @brief Triggers a single conversion for the selected measurement slot.
   *
-  * @param PCAaddr Adres multipleksera PCA9548
-  * @param pcaChannel Maska kanału PCA9548 do aktywacji
-  * @param meas Numer kanału MEAS (0–3)
+  * @param PCAaddr Address of the PCA9548 multiplexer
+  * @param pcaChannel PCA9548 channel mask to enable
+  * @param meas Measurement slot number (0..3)
   */
  void FDC1004_triggerMeasurement(uint8_t PCAaddr, uint8_t pcaChannel, uint8_t meas);
  
  /**
-  * @brief Odczytuje wynik pomiaru (single-ended) i przelicza na femtofarady.
+  * @brief Reads a single-ended measurement result and converts it to attofarads.
   *
-  * @param pcaAddr Adres multipleksera PCA9548
-  * @param pcaChannel Kanał do aktywacji
-  * @param meas Numer kanału MEAS (0–3)
-  * @param offset Offset CAPDAC w pF
-  * @return Pojemność w femtofaradach (uint32_t)
+  * @param pcaAddr Address of the PCA9548 multiplexer
+  * @param pcaChannel PCA9548 channel to enable
+  * @param meas Measurement slot number (0..3)
+  * @param offset_pf CAPDAC offset in picofarads
+  * @return Capacitance value in attofarads
   */
   float FDC1004_getCapacitanceAttofarads(uint8_t pcaAddr, uint8_t pcaChannel, uint8_t meas, float offset_pf);
  
  /**
-  * @brief Odczytuje wartość pomiaru różnicowego i zwraca wynik w pikofaradach (pF).
+  * @brief Reads a differential measurement result and converts it to picofarads.
   * 
-  * Używa surowych danych MSB/LSB z czujnika, konwertuje z formatu Q17.6
-  * (24-bit ze znakiem), obcina do 24-bit, wykonuje korektę znaku i przelicza
-  * na rzeczywiste jednostki pikofaradów.
+  * Uses raw MSB/LSB data from the sensor, converts the Q17.6 signed 24-bit
+  * value and scales it to physical units.
   *
-  * @param pcaAddr Adres multipleksera PCA9548
-  * @param pcaChannel Kanał PCA9548
-  * @param meas Kanał pomiarowy (0–3)
-  * @return Wartość w pikofaradach (float)
+  * @param pcaAddr Address of the PCA9548 multiplexer
+  * @param pcaChannel PCA9548 channel to enable
+  * @param meas Measurement slot number (0..3)
+  * @return Capacitance value in picofarads
   */
  
   float FDC1004_getCapacitancePicoFarradsDifferential(uint8_t pcaAddr, uint8_t pcaChannel, uint8_t meas);
  
-
+ /**
+  * @brief Automatically adjusts CAPDAC and returns the measured capacitance.
+  *
+  * @param pcaAddr Address of the PCA9548 multiplexer
+  * @param pcaChannel PCA9548 channel to enable
+  * @param meas Measurement slot number (0..3)
+  * @param cin Input channel CIN (0..3)
+  * @return Capacitance value in attofarads
+  */
   float FDC1004_getCapacitanceWithAutoCapdac(uint8_t pcaAddr, uint8_t pcaChannel, uint8_t meas, uint8_t cin);
 
 
