@@ -1,0 +1,12 @@
+# Generated files and local environments
+**/build/
+**/.pio/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/work/pycache/
+*.pyc
+*.pyo
+*.kicad_prl
+*.lck
+fp-info-cache

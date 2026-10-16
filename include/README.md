@@ -1,0 +1,3 @@
+# include
+
+Publiczne nagłówki komponentu.

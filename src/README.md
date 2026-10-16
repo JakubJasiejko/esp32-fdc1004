@@ -1,0 +1,3 @@
+# src
+
+Implementacja komponentu.
